@@ -127,7 +127,7 @@ Compatible with modern browsers:
 ## Screenshots
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/40c1f08b-c7e1-48db-b80a-2b6608c429d9" width="100%">
+  <img width="1920" height="1080" alt="InstaAnalyzer (1)" src="https://github.com/user-attachments/assets/40c1f08b-c7e1-48db-b80a-2b6608c429d9" width="100%">
 </p>
 
 <br><br>
