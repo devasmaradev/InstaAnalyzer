@@ -128,13 +128,13 @@ Compatible with modern browsers:
 
 Add screenshots here.
 
-<img width="7959" height="5215" alt="InstaAnalyzer (1)" src="https://github.com/user-attachments/assets/40c1f08b-c7e1-48db-b80a-2b6608c429d9" />
+<img width="7959" height="5215" alt="InstaAnalyzer (1)" src="https://github.com/user-attachments/assets/40c1f08b-c7e1-48db-b80a-2b6608c429d9" style="padding-bottom: 20px;"/>
 
-<img width="7959" height="4868" alt="InstaAnalyzer (2)" src="https://github.com/user-attachments/assets/4a9ccb59-e0c2-4dc0-a763-58263f3ce762" />
+<img width="7959" height="4868" alt="InstaAnalyzer (2)" src="https://github.com/user-attachments/assets/4a9ccb59-e0c2-4dc0-a763-58263f3ce762" style="padding-bottom: 20px;"/>
 
-<img width="7959" height="6744" alt="InstaAnalyzer (3)" src="https://github.com/user-attachments/assets/23a2e1d5-ec95-45fa-a157-ee24f4a21440" />
+<img width="7959" height="6744" alt="InstaAnalyzer (3)" src="https://github.com/user-attachments/assets/23a2e1d5-ec95-45fa-a157-ee24f4a21440" style="padding-bottom: 20px;"/>
 
-<img width="7959" height="5774" alt="InstaAnalyzer (4)" src="https://github.com/user-attachments/assets/c65ae861-64d7-4640-a141-fe72dc18e34b" />
+<img width="7959" height="5774" alt="InstaAnalyzer (4)" src="https://github.com/user-attachments/assets/c65ae861-64d7-4640-a141-fe72dc18e34b" style="padding-bottom: 20px;"/>
 
 ## Local Development
 
