@@ -126,7 +126,15 @@ Compatible with modern browsers:
 
 ## Screenshots
 
-Add screenshots here.
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/40c1f08b-c7e1-48db-b80a-2b6608c429d9" width="100%">
+</p>
+
+<br><br>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/4a9ccb59-e0c2-4dc0-a763-58263f3ce762" width="100%">
+</p>
 
 <img width="7959" height="5215" alt="InstaAnalyzer (1)" src="https://github.com/user-attachments/assets/40c1f08b-c7e1-48db-b80a-2b6608c429d9"/>
 
