@@ -1,4 +1,4 @@
-# InstaAnalyzer
+<img width="7959" height="5215" alt="InstaAnalyzer (1)" src="https://github.com/user-attachments/assets/40c1f08b-c7e1-48db-b80a-2b6608c429d9" /># InstaAnalyzer
 
 A modern, privacy-focused Instagram follower analysis tool that helps you discover:
 
@@ -129,11 +129,16 @@ Compatible with modern browsers:
 Add screenshots here.
 
 ```md
-![Home](screenshots/home.png)
+![Home]<img width="7959" height="5215" alt="InstaAnalyzer (1)" src="https://github.com/user-attachments/assets/703beda7-a65a-46d2-913e-6f876543cbdd" />
 
-![Analysis](screenshots/analysis.png)
 
-![Results](screenshots/results.png)
+![Analysis]<img width="7959" height="4868" alt="InstaAnalyzer (2)" src="https://github.com/user-attachments/assets/7d14b52e-5c3c-4bc1-8657-0b231e2c9d87" />
+
+
+![Results]<img width="7959" height="6744" alt="InstaAnalyzer (3)" src="https://github.com/user-attachments/assets/0ef01bf4-3205-40ff-b3c0-1d11185cbbcc" />
+
+
+<img width="7959" height="5774" alt="InstaAnalyzer (4)" src="https://github.com/user-attachments/assets/f1f62aff-219e-4d4f-94e1-1ada05d8face" />
 ```
 
 ## Local Development
