@@ -1821,3 +1821,55 @@ code {
   .hero-badge { display: none; }
   .tutorial-badge { display: none; }
 }
+
+@keyframes toastIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 20px) scale(0.96);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translate(-50%, -2px) scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes toastOut {
+  to {
+    opacity: 0;
+    transform: translate(-50%, 10px) scale(0.96);
+  }
+}
+
+.ia-toast-error {
+  animation:
+    toastIn 0.35s cubic-bezier(.22,1,.36,1),
+    toastShake 0.45s ease 0.15s;
+}
+
+@keyframes toastShake {
+  0%,100% {
+    transform: translateX(-50%);
+  }
+
+  20% {
+    transform: translateX(calc(-50% - 4px));
+  }
+
+  40% {
+    transform: translateX(calc(-50% + 4px));
+  }
+
+  60% {
+    transform: translateX(calc(-50% - 3px));
+  }
+
+  80% {
+    transform: translateX(calc(-50% + 3px));
+  }
+}

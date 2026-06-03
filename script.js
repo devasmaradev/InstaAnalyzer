@@ -70,7 +70,7 @@ const translations = {
     'tutorial.step5.pill3.label': 'Format',
     'tutorial.step6': 'Enter your <strong>password</strong> to confirm. Meta will begin processing your data.',
     'tutorial.step7': "Wait for Meta to finish. You'll receive an <strong>email notification</strong>, or you can refresh the page until a <strong>Download</strong> button appears.",
-    'tutorial.step8': 'Download the <strong>ZIP file</strong>, extract it, then locate <code>followers_1.json</code> and <code>following.json</code> to upload above.',
+    'tutorial.step8': 'Download the <strong>ZIP file</strong> and upload it directly using <strong>Quick Import</strong>. If needed, you can also extract it and upload <code>followers_1.json</code> and <code>following.json</code> manually.',
     'tutorial.tip1.title': 'Export may take time',
     'tutorial.tip1.desc': 'Meta can take minutes or hours depending on account size.',
     'tutorial.tip2.title': 'Use JSON format',
@@ -143,7 +143,7 @@ const translations = {
     'tutorial.step5.pill3.label': 'Format',
     'tutorial.step6': 'Masukkan <strong>kata sandi</strong> Anda untuk konfirmasi. Meta akan mulai memproses data Anda.',
     'tutorial.step7': 'Tunggu Meta selesai. Anda akan menerima <strong>notifikasi email</strong>, atau Anda bisa muat ulang halaman hingga tombol <strong>Unduh</strong> muncul.',
-    'tutorial.step8': 'Unduh <strong>file ZIP</strong>, ekstrak, lalu temukan <code>followers_1.json</code> dan <code>following.json</code> untuk diunggah di atas.',
+    'tutorial.step8': 'Unduh <strong>file ZIP</strong> dan unggah langsung menggunakan <strong>Impor Cepat</strong>. Jika diperlukan, Anda juga dapat mengekstraknya lalu mengunggah <code>followers_1.json</code> dan <code>following.json</code> secara manual.',
     'tutorial.tip1.title': 'Ekspor mungkin memerlukan waktu',
     'tutorial.tip1.desc': 'Meta bisa memerlukan menit atau jam tergantung ukuran akun.',
     'tutorial.tip2.title': 'Gunakan format JSON',
@@ -819,7 +819,7 @@ function showToast(message, type = 'info') {
   document.querySelectorAll('.ia-toast').forEach(t => t.remove());
 
   const toast = document.createElement('div');
-  toast.className = 'ia-toast';
+  toast.className = `ia-toast ia-toast-${type}`;
 
   const colors = {
     error:   'var(--danger)',
@@ -856,14 +856,20 @@ function showToast(message, type = 'info') {
     z-index: 99999;
     box-shadow: var(--shadow-lg);
     max-width: min(460px, 90vw);
-    animation: slideDown 0.25s ease;
+    animation: toastIn 0.35s cubic-bezier(.22,1,.36,1);
   `;
 
   toast.innerHTML = `<span style="color:${color};flex-shrink:0"><i data-lucide="${icon}" style="width:18px;height:18px;display:block"></i></span><span>${escapeHtml(message)}</span>`;
   document.body.appendChild(toast);
   lucide.createIcons();
 
-  setTimeout(() => toast.remove(), 5000);
+  setTimeout(() => {
+    toast.style.animation = 'toastOut 0.25s ease forwards';
+
+    setTimeout(() => {
+      toast.remove();
+    }, 250);
+  }, 4750);
 }
 
 // ─── Tutorial FAB ─────────────────────────────
