@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>InstaAnalyzer — Instagram Follower Insights</title>
+  <meta name="description" content="Analyze your Instagram followers and following with InstaAnalyzer. Find who doesn't follow you back and who your fans are." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+</head>
+<body>
+
+  <!-- IMAGE MODAL -->
+  <div id="imageModal" role="dialog" aria-modal="true" aria-label="Image zoom view" onclick="closeModal(event)">
+    <div class="modal-inner">
+      <img id="modalImg" src="" alt="Zoomed screenshot" />
+      <button class="modal-close" onclick="document.getElementById('imageModal').classList.remove('open');document.body.style.overflow='';" aria-label="Close modal">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container header-inner">
+
+      <a href="/" class="brand" aria-label="InstaAnalyzer home">
+        <div class="brand-icon" aria-hidden="true">
+          <i data-lucide="instagram"></i>
+        </div>
+        <span class="brand-name">InstaAnalyzer</span>
+      </a>
+
+      <div class="header-actions">
+
+        <!-- LANGUAGE SWITCHER -->
+        <div class="lang-switcher" role="group" aria-label="Language selector">
+          <label class="lang-option">
+            <input type="radio" name="lang" value="en" checked />
+            <span class="lang-label">EN</span>
+          </label>
+          <label class="lang-option">
+            <input type="radio" name="lang" value="id" />
+            <span class="lang-label">ID</span>
+          </label>
+        </div>
+
+        <!-- THEME TOGGLE -->
+        <button id="theme-toggle" class="btn-icon" aria-label="Toggle dark mode" onclick="toggleTheme()">
+          <i data-lucide="sun" class="icon-light" aria-hidden="true"></i>
+          <i data-lucide="moon" class="icon-dark" aria-hidden="true"></i>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main id="main-content">
+    <div class="container">
+
+      <!-- HERO -->
+      <section class="hero" aria-labelledby="hero-heading">
+        <div class="hero-badge">
+          <i data-lucide="sparkles" aria-hidden="true"></i>
+          <span data-i18n="hero.badge">Free &amp; Private — All processing happens in your browser</span>
+        </div>
+        <h1 id="hero-heading" class="hero-title">
+          <span data-i18n="hero.title.line1">Discover Who</span><br class="hero-break" />
+          <span class="gradient-text" data-i18n="hero.title.line2">Really Follows</span>
+          <span data-i18n="hero.title.line3"> You</span>
+        </h1>
+        <p class="hero-subtitle" data-i18n="hero.subtitle">
+          Upload your Instagram export and instantly see who doesn't follow you back — and who your biggest fans are.
+        </p>
+      </section>
+
+      <!-- IMPORT SECTION -->
+      <section id="import-section" class="section" aria-labelledby="import-heading">
+        <h2 id="import-heading" class="sr-only" data-i18n="import.heading">Import your Instagram data</h2>
+
+        <div class="card">
+
+          <!-- TAB HEADER -->
+          <div class="tab-header" role="tablist" aria-label="Import method">
+            <button
+              id="tab-quick-import"
+              role="tab"
+              aria-selected="true"
+              aria-controls="quick-import-panel"
+              onclick="switchImportTab('quick')"
+              class="tab-btn tab-active"
+            >
+              <i data-lucide="zap" aria-hidden="true"></i>
+              <span data-i18n="import.tab.quick">Quick Import</span>
+            </button>
+            <button
+              id="tab-manual-import"
+              role="tab"
+              aria-selected="false"
+              aria-controls="manual-import-panel"
+              onclick="switchImportTab('manual')"
+              class="tab-btn tab-inactive"
+            >
+              <i data-lucide="files" aria-hidden="true"></i>
+              <span data-i18n="import.tab.manual">Manual Import</span>
+            </button>
+          </div>
+
+          <div class="card-body">
+
+            <!-- QUICK IMPORT PANEL -->
+            <div id="quick-import-panel" role="tabpanel" aria-labelledby="tab-quick-import">
+              <div class="import-centered">
+                <div class="import-icon-wrap" aria-hidden="true">
+                  <i data-lucide="file-archive"></i>
+                </div>
+                <h3 class="import-title" data-i18n="import.quick.title">Quick Import via ZIP</h3>
+                <p class="import-desc" data-i18n="import.quick.desc">
+                  Upload your Instagram export ZIP and InstaAnalyzer will automatically detect the required files.
+                </p>
+
+                <div
+                  id="drop-zip"
+                  class="dropzone"
+                  role="button"
+                  tabindex="0"
+                  aria-label="Drop Instagram export ZIP here or click to browse"
+                >
+                  <input type="file" id="zipFile" class="sr-only" accept=".zip" aria-label="Choose ZIP file" />
+                  <div class="dropzone-icon" aria-hidden="true">
+                    <i data-lucide="upload-cloud"></i>
+                  </div>
+                  <p class="dropzone-primary" id="name-zip" data-i18n="import.quick.dropLabel">Drop Instagram Export ZIP here</p>
+                  <p class="dropzone-secondary" data-i18n="import.quick.dropSub">or click to browse &nbsp;·&nbsp; .zip files only</p>
+                  <p class="dropzone-hint">
+                    <i data-lucide="info" aria-hidden="true"></i>
+                    <span data-i18n="import.quick.hint">Automatically detects <code>followers_1.json</code> and <code>following.json</code></span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- MANUAL IMPORT PANEL -->
+            <div id="manual-import-panel" role="tabpanel" aria-labelledby="tab-manual-import" class="hidden">
+              <div class="manual-grid">
+
+                <!-- FOLLOWERS -->
+                <div class="manual-card">
+                  <div class="manual-card-header">
+                    <div class="manual-icon followers-icon" aria-hidden="true">
+                      <i data-lucide="users-round"></i>
+                    </div>
+                    <div>
+                      <h3 class="manual-card-title" data-i18n="import.manual.followers.title">Followers List</h3>
+                      <p class="manual-card-desc"><span data-i18n="import.manual.followers.desc">Upload</span> <code>followers_1.json</code></p>
+                    </div>
+                  </div>
+                  <div
+                    id="drop-followers"
+                    class="dropzone dropzone-sm"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Drop followers_1.json here or click to browse"
+                  >
+                    <input type="file" id="followersFile" class="sr-only" accept=".json" aria-label="Choose followers JSON file" />
+                    <div class="dropzone-icon" aria-hidden="true">
+                      <i data-lucide="user-plus"></i>
+                    </div>
+                    <p class="dropzone-primary" id="name-followers">Drop <code>followers_1.json</code> here</p>
+                    <p class="dropzone-secondary" data-i18n="import.manual.dropSub">or click to browse</p>
+                  </div>
+                </div>
+
+                <!-- FOLLOWING -->
+                <div class="manual-card">
+                  <div class="manual-card-header">
+                    <div class="manual-icon following-icon" aria-hidden="true">
+                      <i data-lucide="user-round-plus"></i>
+                    </div>
+                    <div>
+                      <h3 class="manual-card-title" data-i18n="import.manual.following.title">Following List</h3>
+                      <p class="manual-card-desc"><span data-i18n="import.manual.following.desc">Upload</span> <code>following.json</code></p>
+                    </div>
+                  </div>
+                  <div
+                    id="drop-following"
+                    class="dropzone dropzone-sm"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Drop following.json here or click to browse"
+                  >
+                    <input type="file" id="followingFile" class="sr-only" accept=".json" aria-label="Choose following JSON file" />
+                    <div class="dropzone-icon" aria-hidden="true">
+                      <i data-lucide="users"></i>
+                    </div>
+                    <p class="dropzone-primary" id="name-following">Drop <code>following.json</code> here</p>
+                    <p class="dropzone-secondary" data-i18n="import.manual.dropSub">or click to browse</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="action-row">
+          <button id="analyze-btn" onclick="processData()" class="btn-primary" aria-label="Start analysis">
+            <i data-lucide="bar-chart-2" aria-hidden="true"></i>
+            <span data-i18n="btn.analyze">Start Analysis</span>
+          </button>
+          <!-- <button id="reset-btn" onclick="resetApp()" class="btn-secondary hidden" aria-label="Analyze another export">
+            <i data-lucide="refresh-cw" aria-hidden="true"></i>
+            <span data-i18n="btn.reset">Analyze Another Export</span>
+          </button> -->
+        </div>
+
+      </section>
+
+      <div id="reset-wrapper" class="action-row hidden" aria-label="Analyze another export">
+          <button id="reset-btn" onclick="resetApp()" class="btn-primary" aria-label="Analyze another export">
+            <i data-lucide="refresh-cw" aria-hidden="true"></i>
+            <span data-i18n="btn.reset">Analyze Another Export</span>
+          </button>
+      </div>
+
+      <!-- <div id="reset-wrapper" class="hidden">
+          <button id="reset-btn" onclick="resetApp()">
+              Analyze Another Export
+          </button>
+      </div> -->
+
+      <!-- STATS -->
+      <section id="stats-area" class="section hidden fade-in" aria-labelledby="stats-heading">
+        <h2 id="stats-heading" class="sr-only" data-i18n="stats.heading">Analysis Summary</h2>
+        <div class="stats-grid">
+
+          <div class="stat-card">
+            <span class="stat-label" data-i18n="stats.followers">Followers</span>
+            <strong class="stat-value" id="stat-followers">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-label" data-i18n="stats.following">Following</span>
+            <strong class="stat-value" id="stat-following">0</strong>
+          </div>
+
+          <div class="stat-card stat-danger">
+            <span class="stat-label" data-i18n="stats.notback">Not Following Back</span>
+            <strong class="stat-value" id="stat-notback">0</strong>
+          </div>
+
+          <div class="stat-card stat-success">
+            <span class="stat-label" data-i18n="stats.fans">Fans</span>
+            <strong class="stat-value" id="stat-fans">0</strong>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- RESULTS -->
+      <section id="results-area" class="section hidden fade-in" aria-labelledby="results-heading">
+        <h2 id="results-heading" class="sr-only" data-i18n="results.heading">Analysis Results</h2>
+
+        <div class="card results-card">
+
+          <!-- RESULT TABS -->
+          <div class="tab-header" role="tablist" aria-label="Results view">
+            <button
+              onclick="switchTab('notFollowingBack')"
+              id="tab-notback"
+              role="tab"
+              aria-selected="true"
+              aria-controls="results-list-panel"
+              class="tab-btn tab-active"
+            >
+              <i data-lucide="user-x" aria-hidden="true"></i>
+              <span data-i18n="results.tab.notback">Not Following Back</span>
+              <span class="tab-count" id="count-notback">0</span>
+              <span class="tooltip-wrap" data-i18n-tip="results.tip.notback" data-tip="People you follow who don't follow you back">
+                <i data-lucide="info" class="tooltip-icon" aria-hidden="true"></i>
+              </span>
+            </button>
+
+            <button
+              onclick="switchTab('fans')"
+              id="tab-fans"
+              role="tab"
+              aria-selected="false"
+              aria-controls="results-list-panel"
+              class="tab-btn tab-inactive"
+            >
+              <i data-lucide="heart" aria-hidden="true"></i>
+              <span data-i18n="results.tab.fans">Fans</span>
+              <span class="tab-count" id="count-fans">0</span>
+              <span class="tooltip-wrap" data-i18n-tip="results.tip.fans" data-tip="People who follow you, but you don't follow back">
+                <i data-lucide="info" class="tooltip-icon" aria-hidden="true"></i>
+              </span>
+            </button>
+          </div>
+
+          <!-- SEARCH -->
+          <div class="search-bar">
+            <label for="searchInput" class="sr-only" data-i18n="search.label">Search username</label>
+            <i data-lucide="search" class="search-icon" aria-hidden="true"></i>
+            <input
+              type="search"
+              id="searchInput"
+              oninput="renderList()"
+              data-i18n-placeholder="search.placeholder"
+              placeholder="Search username…"
+              class="search-input"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+
+          <!-- LIST -->
+          <div id="results-list-panel" role="tabpanel" class="results-list-wrap custom-scrollbar">
+            <ul id="activeList" class="results-list" aria-live="polite" aria-label="User list"></ul>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TUTORIAL -->
+      <section class="section" aria-labelledby="tutorial-heading">
+
+        <div class="tutorial-card">
+
+          <!-- TUTORIAL HEADER -->
+          <div class="tutorial-header">
+            <div class="tutorial-header-left">
+              <p class="section-label" data-i18n="tutorial.label">Tutorial</p>
+              <h2 id="tutorial-heading" class="tutorial-title" data-i18n="tutorial.title">How to Get Your Instagram JSON Files</h2>
+              <p class="tutorial-desc" data-i18n="tutorial.desc">
+                Follow these steps to export your followers &amp; following data directly from Meta Accounts Center.
+              </p>
+            </div>
+            <div class="tutorial-badge">
+              <div class="tutorial-badge-icon" aria-hidden="true">
+                <i data-lucide="shield-check"></i>
+              </div>
+              <div>
+                <p class="tutorial-badge-label" data-i18n="tutorial.badge.label">Safe Process</p>
+                <p class="tutorial-badge-value" data-i18n="tutorial.badge.value">Official Meta Export</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- TUTORIAL BODY -->
+          <div class="tutorial-body">
+
+            <!-- STEPS -->
+            <div class="tutorial-steps" aria-label="Step by step instructions">
+
+              <ol class="steps-list">
+
+                <li class="step">
+                  <div class="step-num" aria-hidden="true">1</div>
+                  <div class="step-content">
+                    <span data-i18n="tutorial.step1.pre">Go to</span>
+                    <a href="https://accountscenter.instagram.com/info_and_permissions/" target="_blank" rel="noopener noreferrer" class="link">
+                      Meta Accounts Center
+                      <i data-lucide="external-link" aria-hidden="true"></i>
+                    </a>
+                    <span data-i18n="tutorial.step1.post">› <strong>Your information and permissions</strong> and select <strong>"Export your information"</strong>.</span>
+                  </div>
+                </li>
+
+                <li class="step">
+                  <div class="step-num" aria-hidden="true">2</div>
+                  <div class="step-content" data-i18n="tutorial.step2">
+                    Click the <strong>"Create export"</strong> button to start a new request.
+                  </div>
+                </li>
+
+                <li class="step">
+                  <div class="step-num" aria-hidden="true">3</div>
+                  <div class="step-content" data-i18n="tutorial.step3">
+                    Select the <strong>Instagram profile</strong> you want to analyze.
+                  </div>
+                </li>
+
+                <li class="step">
+                  <div class="step-num" aria-hidden="true">4</div>
+                  <div class="step-content" data-i18n="tutorial.step4">
+                    Choose <strong>"Export to device"</strong> as your destination.
+                  </div>
+                </li>
+
+                <li class="step">
+                  <div class="step-num" aria-hidden="true">5</div>
+                  <div class="step-content">
+                    <strong data-i18n="tutorial.step5.title">Configure format:</strong>
+                    <div class="format-pills">
+                      <div class="format-pill">
+                        <span class="format-pill-label" data-i18n="tutorial.step5.pill1.label">Customize information</span>
+                        <span class="format-pill-value" data-i18n="tutorial.step5.pill1.value">Followers &amp; following</span>
+                      </div>
+                      <div class="format-pill">
+                        <span class="format-pill-label" data-i18n="tutorial.step5.pill2.label">Date Range</span>
+                        <span class="format-pill-value" data-i18n="tutorial.step5.pill2.value">All time</span>
+                      </div>
+                      <div class="format-pill format-pill-accent">
+                        <span class="format-pill-label" data-i18n="tutorial.step5.pill3.label">Format</span>
+                        <span class="format-pill-value">JSON ✓</span>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+
+                <li class="step">
+                  <div class="step-num" aria-hidden="true">6</div>
+                  <div class="step-content" data-i18n="tutorial.step6">
+                    Enter your <strong>password</strong> to confirm. Meta will begin processing your data.
+                  </div>
+                </li>
+
+                <li class="step">
+                  <div class="step-num" aria-hidden="true">7</div>
+                  <div class="step-content" data-i18n="tutorial.step7">
+                    Wait for Meta to finish. You'll receive an <strong>email notification</strong>, or you can refresh the page until a <strong>Download</strong> button appears.
+                  </div>
+                </li>
+
+                <li class="step step-success">
+                  <div class="step-num step-num-success" aria-hidden="true">8</div>
+                  <div class="step-content" data-i18n="tutorial.step8">
+                    Download the <strong>ZIP file</strong>, extract it, then locate <code>followers_1.json</code> and <code>following.json</code> to upload above.
+                  </div>
+                </li>
+
+              </ol>
+
+              <!-- TIPS -->
+              <div class="tips">
+                <div class="tip">
+                  <div class="tip-icon tip-icon-warn" aria-hidden="true">
+                    <i data-lucide="clock-3"></i>
+                  </div>
+                  <div>
+                    <p class="tip-title" data-i18n="tutorial.tip1.title">Export may take time</p>
+                    <p class="tip-desc" data-i18n="tutorial.tip1.desc">Meta can take minutes or hours depending on account size.</p>
+                  </div>
+                </div>
+
+                <div class="tip">
+                  <div class="tip-icon tip-icon-danger" aria-hidden="true">
+                    <i data-lucide="alert-circle"></i>
+                  </div>
+                  <div>
+                    <p class="tip-title" data-i18n="tutorial.tip2.title">Use JSON format</p>
+                    <p class="tip-desc" data-i18n="tutorial.tip2.desc">Choosing HTML format will not work with this analyzer.</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- SLIDESHOW -->
+            <div class="tutorial-slides-wrap">
+
+              <div class="slides-header">
+                <div>
+                  <p class="section-label" data-i18n="tutorial.slides.label">Visual Guide</p>
+                  <h3 class="slides-title" data-i18n="tutorial.slides.title">Step-by-step Screenshots</h3>
+                </div>
+                <div class="slides-zoom-hint" aria-hidden="true">
+                  <i data-lucide="zoom-in"></i>
+                  <span data-i18n="tutorial.slides.zoom">Click to zoom</span>
+                </div>
+              </div>
+
+              <div class="slideshow" role="region" aria-label="Tutorial screenshots slideshow">
+
+                <div class="slides-container">
+
+                  <div class="slide fade-slide" data-slide="1" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 1 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                    <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB0EFDA621FCDAF59078A" alt="Step 1 screenshot" loading="lazy" />
+                    <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
+                    <span class="slide-counter" aria-hidden="true">1 / 8</span>
+                  </div>
+
+                  <div class="slide fade-slide" data-slide="2" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 2 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                    <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB0FF755C5DF69BAA6C60" alt="Step 2 screenshot" loading="lazy" />
+                    <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
+                    <span class="slide-counter" aria-hidden="true">2 / 8</span>
+                  </div>
+
+                  <div class="slide fade-slide" data-slide="3" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 3 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                    <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB09500F60B3188C93571" alt="Step 3 screenshot" loading="lazy" />
+                    <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
+                    <span class="slide-counter" aria-hidden="true">3 / 8</span>
+                  </div>
+
+                  <div class="slide fade-slide" data-slide="4" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 4 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                    <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB0F65CD1B4B210E4F212" alt="Step 4 screenshot" loading="lazy" />
+                    <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
+                    <span class="slide-counter" aria-hidden="true">4 / 8</span>
+                  </div>
+
+                  <div class="slide fade-slide" data-slide="5" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 5 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                    <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB0F739429C44EF648332" alt="Step 5 screenshot" loading="lazy" />
+                    <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
+                    <span class="slide-counter" aria-hidden="true">5 / 8</span>
+                  </div>
+
+                  <div class="slide fade-slide" data-slide="6" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 6 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                    <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB096699A9A6B7C233557" alt="Step 6 screenshot" loading="lazy" />
+                    <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
+                    <span class="slide-counter" aria-hidden="true">6 / 8</span>
+                  </div>
+
+                  <div class="slide fade-slide" data-slide="7" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 7 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                    <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB00C92C129A246DB7D50" alt="Step 7 screenshot" loading="lazy" />
+                    <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
+                    <span class="slide-counter" aria-hidden="true">7 / 8</span>
+                  </div>
+
+                  <div class="slide fade-slide" data-slide="8" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 8 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                    <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB0F606FC51DE46AB4EF9" alt="Step 8 screenshot" loading="lazy" />
+                    <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
+                    <span class="slide-counter" aria-hidden="true">8 / 8</span>
+                  </div>
+
+                </div>
+
+                <button class="slide-nav slide-prev" onclick="plusSlides(-1)" aria-label="Previous screenshot">
+                  <i data-lucide="chevron-left" aria-hidden="true"></i>
+                </button>
+                <button class="slide-nav slide-next" onclick="plusSlides(1)" aria-label="Next screenshot">
+                  <i data-lucide="chevron-right" aria-hidden="true"></i>
+                </button>
+
+                <div class="slide-dots" id="slideDots" role="tablist" aria-label="Slide navigation"></div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="footer-text">
+        <span data-i18n="footer.made">Made with</span>
+        <i data-lucide="coffee" class="footer-icon" aria-hidden="true"></i>
+        <span data-i18n="footer.by">by</span> <strong>AsmaraDev</strong>
+      </p>
+      <p class="footer-privacy">
+        <i data-lucide="lock" class="footer-icon" aria-hidden="true"></i>
+        <span data-i18n="footer.privacy">Your data never leaves your device</span>
+      </p>
+    </div>
+  </footer>
+
+  <!-- TUTORIAL FAB -->
+  <button id="tutorialFab" class="tutorial-fab" aria-label="Go to Tutorial">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+      <path d="M6.5 2H20v15H6.5A2.5 2.5 0 0 0 4 19.5V4.5A2.5 2.5 0 0 1 6.5 2z"/>
+    </svg>
+    <span data-i18n="fab.tutorial">Tutorial</span>
+  </button>
+
+  <script src="script.js"></script>
+</body>
+</html>
