@@ -127,25 +127,25 @@ Compatible with modern browsers:
 ## Screenshots
 
 <p align="center">
-  <img alt="InstaAnalyzer (1)" src="<img width="7959" height="5425" alt="InstaAnalyzer (1)" src="https://github.com/user-attachments/assets/cec716bf-ac34-46d3-a61c-2b25448a3282" width="100%">
+  <img width="7959" height="5425" alt="InstaAnalyzer (1)" src="https://github.com/user-attachments/assets/cec716bf-ac34-46d3-a61c-2b25448a3282" width="100%">
 </p>
 
 ---
 
 <p align="center">
-  <img alt="InstaAnalyzer (2)" src="<img width="7959" height="5078" alt="InstaAnalyzer (2)" src="https://github.com/user-attachments/assets/af314a7e-8c89-4c12-97d7-95c312ba7ec7" width="100%">
+  <img width="7959" height="5078" alt="InstaAnalyzer (2)" src="https://github.com/user-attachments/assets/af314a7e-8c89-4c12-97d7-95c312ba7ec7" width="100%">
 </p>
 
 ---
 
 <p align="center">
-  <img alt="InstaAnalyzer (3)" src="<img width="7959" height="5568" alt="InstaAnalyzer (3)" src="https://github.com/user-attachments/assets/35621d4e-1651-4f1e-9a54-cc0dfd999196" width="100%">
+  <img width="7959" height="5568" alt="InstaAnalyzer (3)" src="https://github.com/user-attachments/assets/35621d4e-1651-4f1e-9a54-cc0dfd999196" width="100%">
 </p>
 
 ---
 
 <p align="center">
-  <img alt="InstaAnalyzer (4)" src="<img width="7959" height="9990" alt="InstaAnalyzer (4)" src="https://github.com/user-attachments/assets/22675245-88ab-4935-b57c-8215d2bd0856" width="100%">
+  <img width="7959" height="9990" alt="InstaAnalyzer (4)" src="https://github.com/user-attachments/assets/22675245-88ab-4935-b57c-8215d2bd0856" width="100%">
 </p>
 
 ## Local Development
