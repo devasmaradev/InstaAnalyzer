@@ -200,19 +200,42 @@ code {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
+@keyframes fabFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
 }
 
-@keyframes fabFloat {
-  0%   { transform: translateY(0); }
-  50%  { transform: translateY(-8px); }
-  100% { transform: translateY(0); }
+@keyframes toastIn {
+  0%   { opacity: 0; transform: translate(-50%, 20px) scale(0.96); }
+  60%  { opacity: 1; transform: translate(-50%, -2px) scale(1.02); }
+  100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+@keyframes toastOut {
+  to { opacity: 0; transform: translate(-50%, 10px) scale(0.96); }
+}
+
+@keyframes toastShake {
+  0%, 100% { transform: translateX(-50%); }
+  20%       { transform: translateX(calc(-50% - 4px)); }
+  40%       { transform: translateX(calc(-50% + 4px)); }
+  60%       { transform: translateX(calc(-50% - 3px)); }
+  80%       { transform: translateX(calc(-50% + 3px)); }
+}
+
+@keyframes slideAppear {
+  from { opacity: 0.3; }
+  to   { opacity: 1; }
 }
 
 .fade-in {
   animation: fadeIn 0.45s var(--transition) forwards;
+}
+
+.ia-toast-error {
+  animation:
+    toastIn 0.35s cubic-bezier(.22, 1, .36, 1),
+    toastShake 0.45s ease 0.15s;
 }
 
 /* ─── Header ─── */
@@ -625,13 +648,15 @@ code {
   stroke: var(--accent);
 }
 
-.dropzone:hover .dropzone-icon {
+.dropzone:hover .dropzone-icon,
+.dropzone.drag-over .dropzone-icon {
   background: var(--accent);
   border-color: var(--accent);
   transform: scale(1.05);
 }
 
-.dropzone:hover .dropzone-icon svg {
+.dropzone:hover .dropzone-icon svg,
+.dropzone.drag-over .dropzone-icon svg {
   color: #fff;
   stroke: #fff;
 }
@@ -749,7 +774,7 @@ code {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-top: 20px;
+  margin-top: 40px;
   flex-wrap: wrap;
 }
 
@@ -786,6 +811,12 @@ code {
   height: 18px;
 }
 
+.btn-primary.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .btn-secondary {
   display: inline-flex;
   align-items: center;
@@ -812,12 +843,6 @@ code {
 .btn-secondary svg {
   width: 18px;
   height: 18px;
-}
-
-.btn-primary.loading {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
 }
 
 /* ─── Stats ─── */
@@ -869,6 +894,18 @@ code {
 .stat-success .stat-label { color: var(--success); }
 .stat-success .stat-value { color: var(--success); }
 .stat-success { border-color: var(--success-border); background: var(--success-light); }
+
+#import-section {
+  padding-top: 20px;
+}
+
+#tutorial-section {
+  padding-top: 20px;
+}
+
+#tutorial-toggle-wrapper {
+  padding-bottom: 20px;
+}
 
 /* ─── Results ─── */
 .results-card {
@@ -1124,9 +1161,14 @@ code {
 }
 
 .tutorial-body {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+/* .tutorial-body {
   display: grid;
   grid-template-columns: 1fr 1fr;
-}
+} */
 
 .tutorial-steps {
   padding: 32px 36px;
@@ -1379,11 +1421,6 @@ code {
   animation: slideAppear 0.35s ease;
 }
 
-@keyframes slideAppear {
-  from { opacity: 0.3; }
-  to   { opacity: 1; }
-}
-
 .slide img {
   max-width: 100%;
   max-height: 100%;
@@ -1544,8 +1581,6 @@ code {
   border-top: 1px solid var(--border);
   padding: 28px 0;
   margin-top: 60px;
-  position: relative;
-  z-index: 1;
   transition: background var(--transition-slow), border-color var(--transition-slow);
 }
 
@@ -1588,11 +1623,6 @@ code {
   stroke: var(--success);
 }
 
-/* ─── Tutorial Section spacing ─── */
-.section[aria-labelledby="tutorial-heading"] {
-  padding-top: 20px;
-}
-
 /* ─── Tutorial FAB ─── */
 .tutorial-fab {
   position: fixed;
@@ -1612,8 +1642,6 @@ code {
   font-weight: 700;
   border: none;
   cursor: pointer;
-  opacity: 1;
-  visibility: visible;
   animation: fabFloat 3s ease-in-out infinite;
   transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease, background var(--transition);
 }
@@ -1634,7 +1662,6 @@ code {
 .tutorial-fab.hidden-fab {
   opacity: 0;
   visibility: hidden;
-  transform: translateY(20px);
   pointer-events: none;
 }
 
@@ -1642,31 +1669,26 @@ code {
    RESPONSIVE DESIGN
    ============================================= */
 
-/* ─── 2560px + ─── */
 @media (min-width: 2560px) {
   .container { max-width: 1400px; }
   .hero-title { font-size: 4.5rem; }
 }
 
-/* ─── 1920px ─── */
 @media (min-width: 1920px) {
   .container { max-width: 1280px; }
 }
 
-/* ─── 1600px ─── */
 @media (min-width: 1600px) {
   :root { --header-h: 72px; }
   .card-body { padding: 36px 40px 44px; }
 }
 
-/* ─── Under 1280px ─── */
 @media (max-width: 1280px) {
   .tutorial-body { grid-template-columns: 1fr; }
   .tutorial-steps { border-right: none; border-bottom: 1px solid var(--border); }
   .slideshow { aspect-ratio: 16 / 9; }
 }
 
-/* ─── Under 1024px ─── */
 @media (max-width: 1024px) {
   .container { padding: 0 24px; }
   .hero { padding: 48px 0 16px; }
@@ -1678,7 +1700,6 @@ code {
   .card-body { padding: 24px; }
 }
 
-/* ─── Under 820px ─── */
 @media (max-width: 820px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .manual-grid { grid-template-columns: 1fr; }
@@ -1688,7 +1709,6 @@ code {
   .tutorial-slides-wrap { padding: 20px; }
 }
 
-/* ─── Under 768px ─── */
 @media (max-width: 768px) {
   :root { --header-h: 60px; }
 
@@ -1732,7 +1752,7 @@ code {
   .slides-zoom-hint { display: none; }
   .slide-dots { display: none; }
 
-  .slide-zoom-icon { opacity: 1; transform: scale(1); background: rgba(0,0,0,0.5); }
+  .slide-zoom-icon { opacity: 1; transform: scale(1); background: rgba(0, 0, 0, 0.5); }
   .slide-overlay { background: rgba(0, 0, 0, 0.08); }
   .slide:hover img { transform: none; }
 
@@ -1762,11 +1782,9 @@ code {
   .tutorial-fab span { display: none; }
   .tutorial-fab svg { width: 22px; height: 22px; }
 
-  /* Language switcher — compact on mobile */
   .lang-label { padding: 5px 9px; font-size: 0.68rem; }
 }
 
-/* ─── Under 480px ─── */
 @media (max-width: 480px) {
   .hero-title { font-size: 1.6rem; }
   .brand-name { font-size: 1.1rem; }
@@ -1795,14 +1813,12 @@ code {
   .slide-counter { font-size: 0.65rem; padding: 4px 10px; }
 }
 
-/* ─── Under 390px ─── */
 @media (max-width: 390px) {
   .header-inner { gap: 8px; }
   .brand-name { font-size: 1rem; }
   .lang-label { padding: 4px 8px; }
 }
 
-/* ─── Under 360px ─── */
 @media (max-width: 360px) {
   .container { padding: 0 12px; }
   .hero-title { font-size: 1.4rem; }
@@ -1815,61 +1831,8 @@ code {
   .tips { gap: 8px; }
 }
 
-/* ─── Under 320px ─── */
 @media (max-width: 320px) {
   .hero { padding: 24px 0 8px; }
   .hero-badge { display: none; }
   .tutorial-badge { display: none; }
-}
-
-@keyframes toastIn {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, 20px) scale(0.96);
-  }
-
-  60% {
-    opacity: 1;
-    transform: translate(-50%, -2px) scale(1.02);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translate(-50%, 0) scale(1);
-  }
-}
-
-@keyframes toastOut {
-  to {
-    opacity: 0;
-    transform: translate(-50%, 10px) scale(0.96);
-  }
-}
-
-.ia-toast-error {
-  animation:
-    toastIn 0.35s cubic-bezier(.22,1,.36,1),
-    toastShake 0.45s ease 0.15s;
-}
-
-@keyframes toastShake {
-  0%,100% {
-    transform: translateX(-50%);
-  }
-
-  20% {
-    transform: translateX(calc(-50% - 4px));
-  }
-
-  40% {
-    transform: translateX(calc(-50% + 4px));
-  }
-
-  60% {
-    transform: translateX(calc(-50% - 3px));
-  }
-
-  80% {
-    transform: translateX(calc(-50% + 3px));
-  }
 }

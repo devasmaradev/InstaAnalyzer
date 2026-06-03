@@ -88,6 +88,10 @@ const translations = {
     'toast.onlyZip': 'Only ZIP files are allowed.',
     'toast.onlyJson': 'Only JSON files are allowed.',
     'toast.readingZip': 'Reading ZIP…',
+    'tutorial.show': 'Show Tutorial',
+    'tutorial.hide': 'Hide Tutorial',
+    'manual.followers.drop': 'Drop <code>followers_1.json</code> here',
+    'manual.following.drop': 'Drop <code>following.json</code> here',
   },
   id: {
     'hero.badge': 'Gratis &amp; Privat — Semua pemrosesan terjadi di browser Anda',
@@ -161,62 +165,71 @@ const translations = {
     'toast.onlyZip': 'Hanya file ZIP yang diizinkan.',
     'toast.onlyJson': 'Hanya file JSON yang diizinkan.',
     'toast.readingZip': 'Membaca ZIP…',
+    'tutorial.show': 'Tampilkan Tutorial',
+    'tutorial.hide': 'Sembunyikan Tutorial',
+    'manual.followers.drop': 'Seret <code>followers_1.json</code> ke sini',
+    'manual.following.drop': 'Seret <code>following.json</code> ke sini',
   },
 };
 
-// ─── i18n Core ────────────────────────────────
+// ─── i18n ─────────────────────────────────────
 let currentLang = 'en';
 
 function t(key) {
-  return (translations[currentLang] && translations[currentLang][key]) ||
-         (translations['en'][key]) ||
-         key;
+  return (translations[currentLang]?.[key]) ?? (translations.en[key]) ?? key;
 }
 
 function applyTranslations() {
-  // data-i18n elements (innerHTML for elements that contain HTML)
   document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    const value = t(key);
-    if (value !== undefined) {
-      el.innerHTML = value;
-    }
+    const value = t(el.getAttribute('data-i18n'));
+    if (value !== undefined) el.innerHTML = value;
   });
 
-  // data-i18n-placeholder elements
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    const key = el.getAttribute('data-i18n-placeholder');
-    const value = t(key);
-    if (value !== undefined) {
-      el.placeholder = value;
-    }
+    const value = t(el.getAttribute('data-i18n-placeholder'));
+    if (value !== undefined) el.placeholder = value;
   });
 
-  // data-i18n-tip elements (tooltip data-tip attribute)
   document.querySelectorAll('[data-i18n-tip]').forEach(el => {
-    const key = el.getAttribute('data-i18n-tip');
-    const value = t(key);
-    if (value !== undefined) {
-      el.setAttribute('data-tip', value);
-    }
+    const value = t(el.getAttribute('data-i18n-tip'));
+    if (value !== undefined) el.setAttribute('data-tip', value);
   });
 
-  // Restore dynamic dropzone labels that haven't been overridden by a file load
+  // Restore ZIP dropzone label only if no file is loaded
   const nameZip = document.getElementById('name-zip');
   if (nameZip && !nameZip.dataset.fileLoaded) {
     nameZip.innerHTML = t('import.quick.dropLabel');
     nameZip.style.color = '';
   }
 
-  // Update analyze button if not in loading state
+  // Restore manual dropzone labels only if no file is loaded
+  const nameFollowers = document.getElementById('name-followers');
+  if (nameFollowers && !nameFollowers.dataset.fileLoaded) {
+    nameFollowers.innerHTML = t('manual.followers.drop');
+    nameFollowers.style.color = '';
+  }
+
+  const nameFollowing = document.getElementById('name-following');
+  if (nameFollowing && !nameFollowing.dataset.fileLoaded) {
+    nameFollowing.innerHTML = t('manual.following.drop');
+    nameFollowing.style.color = '';
+  }
+
+  // Update analyze button text if not loading
   const analyzeBtn = document.getElementById('analyze-btn');
   if (analyzeBtn && !analyzeBtn.classList.contains('loading')) {
-    const icon = analyzeBtn.querySelector('i');
     const span = analyzeBtn.querySelector('span[data-i18n]');
     if (span) span.innerHTML = t('btn.analyze');
   }
 
-  // Update html lang attribute
+  // Update tutorial toggle button text
+  const tutorialBtn = document.getElementById('showTutorialBtn');
+  if (tutorialBtn) {
+    const isTutorialHidden = document.getElementById('tutorial-section')?.classList.contains('hidden');
+    const span = tutorialBtn.querySelector('span[data-i18n]');
+    if (span) span.innerHTML = isTutorialHidden ? t('tutorial.show') : t('tutorial.hide');
+  }
+
   document.documentElement.lang = currentLang;
 }
 
@@ -225,8 +238,6 @@ function setLang(lang) {
   currentLang = lang;
   localStorage.setItem('ia-lang', lang);
   applyTranslations();
-
-  // Re-render list to update empty state messages
   renderList();
 }
 
@@ -235,9 +246,7 @@ function initLang() {
   const lang = (saved && translations[saved]) ? saved : 'en';
   currentLang = lang;
 
-  // Sync radio buttons
-  const radios = document.querySelectorAll('input[name="lang"]');
-  radios.forEach(radio => {
+  document.querySelectorAll('input[name="lang"]').forEach(radio => {
     radio.checked = radio.value === lang;
     radio.addEventListener('change', () => {
       if (radio.checked) setLang(radio.value);
@@ -252,9 +261,7 @@ if ('scrollRestoration' in history) {
   history.scrollRestoration = 'manual';
 }
 
-window.addEventListener('load', () => {
-  window.scrollTo(0, 0);
-});
+window.addEventListener('load', () => window.scrollTo(0, 0));
 
 // ─── Init ─────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -270,8 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function initTheme() {
   const saved = localStorage.getItem('ia-theme');
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const theme = saved || (prefersDark ? 'dark' : 'light');
-  applyTheme(theme);
+  applyTheme(saved || (prefersDark ? 'dark' : 'light'));
 }
 
 function applyTheme(theme) {
@@ -303,8 +309,7 @@ function setupDropzone({ zoneId, inputId, labelId, accept, onLoad }) {
 
   input.addEventListener('change', async (e) => {
     const file = e.target.files[0];
-    if (!file) return;
-    await handleFile(file, zone, label, onLoad);
+    if (file) await handleFile(file, zone, label, onLoad);
   });
 
   zone.addEventListener('dragover', (e) => {
@@ -329,6 +334,7 @@ function setupDropzone({ zoneId, inputId, labelId, accept, onLoad }) {
       return;
     }
 
+    // Sync hidden input
     const dt = new DataTransfer();
     dt.items.add(file);
     input.files = dt.files;
@@ -384,7 +390,7 @@ function setupZipDropzone(zoneId, inputId, labelId) {
       let followersEntry = null;
       let followingEntry = null;
 
-      zip.forEach((relativePath, entry) => {
+      zip.forEach((_, entry) => {
         const name = entry.name.toLowerCase();
         if (name.endsWith('followers_1.json')) followersEntry = entry;
         if (name.endsWith('following.json'))   followingEntry = entry;
@@ -397,9 +403,7 @@ function setupZipDropzone(zoneId, inputId, labelId) {
       state.zipFollowersData = JSON.parse(await followersEntry.async('string'));
       state.zipFollowingData = JSON.parse(await followingEntry.async('string'));
 
-      setLabelSuccess(label, `${file.name} — Ready to analyze`);
-
-      // Mark the label as file-loaded so translations don't override it
+      setLabelSuccess(label, file.name);
       if (label) label.dataset.fileLoaded = '1';
     },
   });
@@ -409,6 +413,7 @@ function setLabelSuccess(label, text) {
   if (!label) return;
   label.textContent = text;
   label.style.color = 'var(--success-text)';
+  label.dataset.fileLoaded = '1';
 }
 
 function setLabelLoading(label, text) {
@@ -464,7 +469,7 @@ function extractUsernames(data) {
     if (
       typeof current.title === 'string' &&
       current.title.trim() &&
-      !['Following', 'Followers'].includes(current.title)
+      !['following', 'followers'].includes(current.title.toLowerCase())
     ) {
       usernames.add(current.title.trim().toLowerCase());
     }
@@ -480,9 +485,7 @@ function extractUsernames(data) {
 // ─── Process Data ─────────────────────────────
 async function processData() {
   const btn = document.getElementById('analyze-btn');
-
-  let followersRaw;
-  let followingRaw;
+  let followersRaw, followingRaw;
 
   if (state.zipFollowersData && state.zipFollowingData) {
     followersRaw = state.zipFollowersData;
@@ -491,28 +494,16 @@ async function processData() {
     followersRaw = state.manualFollowersData;
     followingRaw = state.manualFollowingData;
   } else {
-    const f1 = document.getElementById('followersFile')?.files[0];
-    const f2 = document.getElementById('followingFile')?.files[0];
-
-    if (!f1 || !f2) {
-      showToast(t('toast.noFile'), 'error');
-      return;
-    }
-
-    try {
-      followersRaw = await readJSON(f1);
-      followingRaw = await readJSON(f2);
-    } catch (err) {
-      showToast(err.message, 'error');
-      return;
-    }
+    showToast(t('toast.noFile'), 'error');
+    return;
   }
 
-  // Loading state
+  // Set loading state
   btn.classList.add('loading');
   btn.innerHTML = `<i data-lucide="loader-2"></i> <span>${t('btn.analyzing')}</span>`;
   lucide.createIcons();
 
+  // Yield to browser to render loading state
   await new Promise(r => setTimeout(r, 50));
 
   try {
@@ -536,10 +527,20 @@ async function processData() {
     showSection('stats-area');
     showSection('results-area');
 
-    // Hide import section; swap button visibility
+    // Toggle UI visibility
     document.getElementById('import-section').classList.add('hidden');
     document.getElementById('analyze-btn').classList.add('hidden');
     document.getElementById('reset-wrapper').classList.remove('hidden');
+    document.getElementById('tutorial-section').classList.add('hidden');
+    document.getElementById('tutorial-toggle-wrapper').classList.remove('hidden');
+    document.getElementById('tutorialFab').classList.add('hidden-fab');
+
+    // Reset tutorial toggle button label
+    const tutorialBtn = document.getElementById('showTutorialBtn');
+    if (tutorialBtn) {
+      const span = tutorialBtn.querySelector('span[data-i18n]');
+      if (span) span.innerHTML = t('tutorial.show');
+    }
 
     renderList();
     lucide.createIcons();
@@ -565,7 +566,7 @@ function showSection(id) {
 
 // ─── Reset ────────────────────────────────────
 function resetApp() {
-  // Reset state
+  // Reset state data
   state.dataSets = { notFollowingBack: [], fans: [] };
   state.currentTab = 'notFollowingBack';
   state.zipFollowersData = null;
@@ -573,14 +574,15 @@ function resetApp() {
   state.manualFollowersData = null;
   state.manualFollowingData = null;
 
-  // Reset sections
+  // Reset sections visibility
   document.getElementById('stats-area').classList.add('hidden');
   document.getElementById('results-area').classList.add('hidden');
   document.getElementById('import-section').classList.remove('hidden');
-
-  // Button visibility: show analyze, hide reset
   document.getElementById('analyze-btn').classList.remove('hidden');
   document.getElementById('reset-wrapper').classList.add('hidden');
+  document.getElementById('tutorial-toggle-wrapper').classList.add('hidden');
+  document.getElementById('tutorial-section').classList.remove('hidden');
+  document.getElementById('tutorialFab').classList.remove('hidden-fab');
 
   // Reset dropzones
   ['drop-zip', 'drop-followers', 'drop-following'].forEach(id => {
@@ -595,8 +597,19 @@ function resetApp() {
     delete nameZip.dataset.fileLoaded;
   }
 
-  resetLabel('name-followers', 'Drop <code>followers_1.json</code> here');
-  resetLabel('name-following', 'Drop <code>following.json</code> here');
+  const nameFollowers = document.getElementById('name-followers');
+  if (nameFollowers) {
+    nameFollowers.innerHTML = t('manual.followers.drop');
+    nameFollowers.style.color = '';
+    delete nameFollowers.dataset.fileLoaded;
+  }
+
+  const nameFollowing = document.getElementById('name-following');
+  if (nameFollowing) {
+    nameFollowing.innerHTML = t('manual.following.drop');
+    nameFollowing.style.color = '';
+    delete nameFollowing.dataset.fileLoaded;
+  }
 
   // Reset file inputs
   ['zipFile', 'followersFile', 'followingFile'].forEach(id => {
@@ -604,22 +617,21 @@ function resetApp() {
     if (el) el.value = '';
   });
 
-  // Reset search
+  // Reset search and tab
   const search = document.getElementById('searchInput');
   if (search) search.value = '';
 
-  // Reset result tabs to default
   switchTab('notFollowingBack');
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  lucide.createIcons();
-}
+  const importSection = document.getElementById('import-section');
 
-function resetLabel(id, html) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.innerHTML = html;
-  el.style.color = '';
+  if (importSection) {
+    importSection.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+  }
+  lucide.createIcons();
 }
 
 // ─── Tab Switching ────────────────────────────
@@ -628,7 +640,6 @@ function switchImportTab(tab) {
 
   toggleEl('quick-import-panel', isQuick);
   toggleEl('manual-import-panel', !isQuick);
-
   setTabState('tab-quick-import', isQuick);
   setTabState('tab-manual-import', !isQuick);
 
@@ -672,10 +683,7 @@ function renderList() {
 
   const searchTerm = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
   const data = state.dataSets[state.currentTab] || [];
-
-  const filtered = searchTerm
-    ? data.filter(u => u.includes(searchTerm))
-    : data;
+  const filtered = searchTerm ? data.filter(u => u.includes(searchTerm)) : data;
 
   list.innerHTML = '';
 
@@ -698,20 +706,21 @@ function renderList() {
     const li = document.createElement('li');
     li.className = 'user-item';
 
-    const avatarChar = user.charAt(0).toUpperCase();
+    const avatarChar = escapeHtml(user.charAt(0).toUpperCase());
     const profileUrl = `https://instagram.com/${encodeURIComponent(user)}`;
+    const escapedUser = escapeHtml(user);
 
     li.innerHTML = `
       <div class="user-item-left">
-        <div class="user-avatar" aria-hidden="true">${escapeHtml(avatarChar)}</div>
-        <span class="user-name">@${escapeHtml(user)}</span>
+        <div class="user-avatar" aria-hidden="true">${avatarChar}</div>
+        <span class="user-name">@${escapedUser}</span>
       </div>
       <a
         href="${profileUrl}"
         target="_blank"
         rel="noopener noreferrer"
         class="user-link"
-        aria-label="View @${escapeHtml(user)} on Instagram"
+        aria-label="View @${escapedUser} on Instagram"
         title="Open Instagram profile"
       >
         <i data-lucide="external-link"></i>
@@ -763,8 +772,7 @@ function initSlideshow() {
 }
 
 function plusSlides(n) {
-  const next = (state.slideIndex + n + state.totalSlides) % state.totalSlides;
-  goToSlide(next);
+  goToSlide((state.slideIndex + n + state.totalSlides) % state.totalSlides);
 }
 
 function goToSlide(n) {
@@ -792,50 +800,39 @@ function openModal(el) {
   const img = el?.querySelector('img');
   if (!img) return;
 
-  const modal    = document.getElementById('imageModal');
-  const modalImg = document.getElementById('modalImg');
-
-  modalImg.src = img.src;
-  modal.classList.add('open');
+  document.getElementById('modalImg').src = img.src;
+  document.getElementById('imageModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
 function closeModal(e) {
   if (e.target === e.currentTarget || e.target.classList.contains('modal-inner')) {
-    document.getElementById('imageModal').classList.remove('open');
-    document.body.style.overflow = '';
+    closeModalDirect();
   }
 }
 
+function closeModalDirect() {
+  document.getElementById('imageModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    document.getElementById('imageModal')?.classList.remove('open');
-    document.body.style.overflow = '';
-  }
+  if (e.key === 'Escape') closeModalDirect();
 });
 
 // ─── Toast ────────────────────────────────────
 function showToast(message, type = 'info') {
-  document.querySelectorAll('.ia-toast').forEach(t => t.remove());
+  // Remove any existing toasts
+  document.querySelectorAll('.ia-toast').forEach(el => el.remove());
 
-  const toast = document.createElement('div');
-  toast.className = `ia-toast ia-toast-${type}`;
-
-  const colors = {
-    error:   'var(--danger)',
-    success: 'var(--success)',
-    info:    'var(--accent)',
-  };
-
-  const icons = {
-    error:   'alert-circle',
-    success: 'check-circle',
-    info:    'info',
-  };
+  const colors = { error: 'var(--danger)', success: 'var(--success)', info: 'var(--accent)' };
+  const icons  = { error: 'alert-circle', success: 'check-circle', info: 'info' };
 
   const color = colors[type] || colors.info;
   const icon  = icons[type]  || icons.info;
 
+  const toast = document.createElement('div');
+  toast.className = `ia-toast ia-toast-${type}`;
   toast.style.cssText = `
     position: fixed;
     bottom: 24px;
@@ -856,36 +853,41 @@ function showToast(message, type = 'info') {
     z-index: 99999;
     box-shadow: var(--shadow-lg);
     max-width: min(460px, 90vw);
-    animation: toastIn 0.35s cubic-bezier(.22,1,.36,1);
   `;
 
-  toast.innerHTML = `<span style="color:${color};flex-shrink:0"><i data-lucide="${icon}" style="width:18px;height:18px;display:block"></i></span><span>${escapeHtml(message)}</span>`;
+  toast.innerHTML = `
+    <span style="color:${color};flex-shrink:0">
+      <i data-lucide="${icon}" style="width:18px;height:18px;display:block"></i>
+    </span>
+    <span>${escapeHtml(message)}</span>
+  `;
+
   document.body.appendChild(toast);
   lucide.createIcons();
 
+  // Trigger animation after append
+  requestAnimationFrame(() => {
+    toast.style.animation = type === 'error'
+      ? 'toastIn 0.35s cubic-bezier(.22,1,.36,1), toastShake 0.45s ease 0.15s'
+      : 'toastIn 0.35s cubic-bezier(.22,1,.36,1)';
+  });
+
   setTimeout(() => {
     toast.style.animation = 'toastOut 0.25s ease forwards';
-
-    setTimeout(() => {
-      toast.remove();
-    }, 250);
+    setTimeout(() => toast.remove(), 250);
   }, 4750);
 }
 
 // ─── Tutorial FAB ─────────────────────────────
 function initTutorialFab() {
   const fab = document.getElementById('tutorialFab');
-  const tutorialSection = document.querySelector('section[aria-labelledby="tutorial-heading"]');
+  const tutorialSection = document.getElementById('tutorial-section');
 
   if (!fab || !tutorialSection) return;
 
-  fab.addEventListener('click', () => {
-    tutorialSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-
   const observer = new IntersectionObserver(
     (entries) => {
-      entries.forEach((entry) => {
+      entries.forEach(entry => {
         fab.classList.toggle('hidden-fab', entry.isIntersecting);
       });
     },
@@ -893,4 +895,33 @@ function initTutorialFab() {
   );
 
   observer.observe(tutorialSection);
+}
+
+function scrollToTutorial() {
+  const tutorialSection = document.getElementById('tutorial-section');
+  if (!tutorialSection) return;
+
+  // Ensure tutorial is visible before scrolling
+  tutorialSection.classList.remove('hidden');
+  tutorialSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function toggleTutorial() {
+  const tutorial = document.getElementById('tutorial-section');
+  const btn = document.getElementById('showTutorialBtn');
+  if (!tutorial || !btn) return;
+
+  const isHidden = tutorial.classList.contains('hidden');
+  const span = btn.querySelector('span[data-i18n]');
+
+  tutorial.classList.toggle('hidden', !isHidden);
+
+  if (span) {
+    span.innerHTML = isHidden ? t('tutorial.hide') : t('tutorial.show');
+    span.setAttribute('data-i18n', isHidden ? 'tutorial.hide' : 'tutorial.show');
+  }
+
+  if (isHidden) {
+    tutorial.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }

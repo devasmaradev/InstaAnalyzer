@@ -18,7 +18,7 @@
   <div id="imageModal" role="dialog" aria-modal="true" aria-label="Image zoom view" onclick="closeModal(event)">
     <div class="modal-inner">
       <img id="modalImg" src="" alt="Zoomed screenshot" />
-      <button class="modal-close" onclick="document.getElementById('imageModal').classList.remove('open');document.body.style.overflow='';" aria-label="Close modal">
+      <button class="modal-close" onclick="closeModalDirect()" aria-label="Close modal">
         <i data-lucide="x"></i>
       </button>
     </div>
@@ -27,7 +27,6 @@
   <!-- HEADER -->
   <header class="site-header">
     <div class="container header-inner">
-
       <a href="/" class="brand" aria-label="InstaAnalyzer home">
         <div class="brand-icon" aria-hidden="true">
           <i data-lucide="instagram"></i>
@@ -36,7 +35,6 @@
       </a>
 
       <div class="header-actions">
-
         <!-- LANGUAGE SWITCHER -->
         <div class="lang-switcher" role="group" aria-label="Language selector">
           <label class="lang-option">
@@ -54,7 +52,6 @@
           <i data-lucide="sun" class="icon-light" aria-hidden="true"></i>
           <i data-lucide="moon" class="icon-dark" aria-hidden="true"></i>
         </button>
-
       </div>
     </div>
   </header>
@@ -71,8 +68,7 @@
         </div>
         <h1 id="hero-heading" class="hero-title">
           <span data-i18n="hero.title.line1">Discover Who</span><br class="hero-break" />
-          <span class="gradient-text" data-i18n="hero.title.line2">Really Follows</span>
-          <span data-i18n="hero.title.line3"> You</span>
+          <span class="gradient-text" data-i18n="hero.title.line2">Really Follows</span><span data-i18n="hero.title.line3"> You</span>
         </h1>
         <p class="hero-subtitle" data-i18n="hero.subtitle">
           Upload your Instagram export and instantly see who doesn't follow you back — and who your biggest fans are.
@@ -84,7 +80,6 @@
         <h2 id="import-heading" class="sr-only" data-i18n="import.heading">Import your Instagram data</h2>
 
         <div class="card">
-
           <!-- TAB HEADER -->
           <div class="tab-header" role="tablist" aria-label="Import method">
             <button
@@ -112,7 +107,6 @@
           </div>
 
           <div class="card-body">
-
             <!-- QUICK IMPORT PANEL -->
             <div id="quick-import-panel" role="tabpanel" aria-labelledby="tab-quick-import">
               <div class="import-centered">
@@ -205,62 +199,46 @@
 
               </div>
             </div>
-
           </div>
         </div>
 
-        <!-- ACTION BUTTONS -->
+        <!-- ANALYZE BUTTON -->
         <div class="action-row">
           <button id="analyze-btn" onclick="processData()" class="btn-primary" aria-label="Start analysis">
             <i data-lucide="bar-chart-2" aria-hidden="true"></i>
             <span data-i18n="btn.analyze">Start Analysis</span>
           </button>
-          <!-- <button id="reset-btn" onclick="resetApp()" class="btn-secondary hidden" aria-label="Analyze another export">
-            <i data-lucide="refresh-cw" aria-hidden="true"></i>
-            <span data-i18n="btn.reset">Analyze Another Export</span>
-          </button> -->
         </div>
-
       </section>
 
-      <div id="reset-wrapper" class="action-row hidden" aria-label="Analyze another export">
-          <button id="reset-btn" onclick="resetApp()" class="btn-primary" aria-label="Analyze another export">
-            <i data-lucide="refresh-cw" aria-hidden="true"></i>
-            <span data-i18n="btn.reset">Analyze Another Export</span>
-          </button>
+      <!-- RESET WRAPPER (shown after analysis) -->
+      <div id="reset-wrapper" class="action-row hidden">
+        <button onclick="resetApp()" class="btn-primary" aria-label="Analyze another export">
+          <i data-lucide="refresh-cw" aria-hidden="true"></i>
+          <span data-i18n="btn.reset">Analyze Another Export</span>
+        </button>
       </div>
-
-      <!-- <div id="reset-wrapper" class="hidden">
-          <button id="reset-btn" onclick="resetApp()">
-              Analyze Another Export
-          </button>
-      </div> -->
 
       <!-- STATS -->
       <section id="stats-area" class="section hidden fade-in" aria-labelledby="stats-heading">
         <h2 id="stats-heading" class="sr-only" data-i18n="stats.heading">Analysis Summary</h2>
         <div class="stats-grid">
-
           <div class="stat-card">
             <span class="stat-label" data-i18n="stats.followers">Followers</span>
             <strong class="stat-value" id="stat-followers">0</strong>
           </div>
-
           <div class="stat-card">
             <span class="stat-label" data-i18n="stats.following">Following</span>
             <strong class="stat-value" id="stat-following">0</strong>
           </div>
-
           <div class="stat-card stat-danger">
             <span class="stat-label" data-i18n="stats.notback">Not Following Back</span>
             <strong class="stat-value" id="stat-notback">0</strong>
           </div>
-
           <div class="stat-card stat-success">
             <span class="stat-label" data-i18n="stats.fans">Fans</span>
             <strong class="stat-value" id="stat-fans">0</strong>
           </div>
-
         </div>
       </section>
 
@@ -269,7 +247,6 @@
         <h2 id="results-heading" class="sr-only" data-i18n="results.heading">Analysis Results</h2>
 
         <div class="card results-card">
-
           <!-- RESULT TABS -->
           <div class="tab-header" role="tablist" aria-label="Results view">
             <button
@@ -325,13 +302,25 @@
           <div id="results-list-panel" role="tabpanel" class="results-list-wrap custom-scrollbar">
             <ul id="activeList" class="results-list" aria-live="polite" aria-label="User list"></ul>
           </div>
-
         </div>
       </section>
 
-      <!-- TUTORIAL -->
-      <section class="section" aria-labelledby="tutorial-heading">
+      <!-- TUTORIAL TOGGLE (shown after analysis) -->
+      <div id="tutorial-toggle-wrapper" class="action-row hidden">
+        <button
+          id="showTutorialBtn"
+          type="button"
+          onclick="toggleTutorial()"
+          class="btn-secondary"
+          aria-label="Show tutorial"
+        >
+          <i data-lucide="book-open" aria-hidden="true"></i>
+          <span data-i18n="tutorial.show">Show Tutorial</span>
+        </button>
+      </div>
 
+      <!-- TUTORIAL -->
+      <section id="tutorial-section" aria-labelledby="tutorial-heading">
         <div class="tutorial-card">
 
           <!-- TUTORIAL HEADER -->
@@ -359,9 +348,7 @@
 
             <!-- STEPS -->
             <div class="tutorial-steps" aria-label="Step by step instructions">
-
               <ol class="steps-list">
-
                 <li class="step">
                   <div class="step-num" aria-hidden="true">1</div>
                   <div class="step-content">
@@ -373,28 +360,24 @@
                     <span data-i18n="tutorial.step1.post">› <strong>Your information and permissions</strong> and select <strong>"Export your information"</strong>.</span>
                   </div>
                 </li>
-
                 <li class="step">
                   <div class="step-num" aria-hidden="true">2</div>
                   <div class="step-content" data-i18n="tutorial.step2">
                     Click the <strong>"Create export"</strong> button to start a new request.
                   </div>
                 </li>
-
                 <li class="step">
                   <div class="step-num" aria-hidden="true">3</div>
                   <div class="step-content" data-i18n="tutorial.step3">
                     Select the <strong>Instagram profile</strong> you want to analyze.
                   </div>
                 </li>
-
                 <li class="step">
                   <div class="step-num" aria-hidden="true">4</div>
                   <div class="step-content" data-i18n="tutorial.step4">
                     Choose <strong>"Export to device"</strong> as your destination.
                   </div>
                 </li>
-
                 <li class="step">
                   <div class="step-num" aria-hidden="true">5</div>
                   <div class="step-content">
@@ -415,29 +398,24 @@
                     </div>
                   </div>
                 </li>
-
                 <li class="step">
                   <div class="step-num" aria-hidden="true">6</div>
                   <div class="step-content" data-i18n="tutorial.step6">
                     Enter your <strong>password</strong> to confirm. Meta will begin processing your data.
                   </div>
                 </li>
-
                 <li class="step">
                   <div class="step-num" aria-hidden="true">7</div>
                   <div class="step-content" data-i18n="tutorial.step7">
                     Wait for Meta to finish. You'll receive an <strong>email notification</strong>, or you can refresh the page until a <strong>Download</strong> button appears.
                   </div>
                 </li>
-
                 <li class="step step-success">
                   <div class="step-num step-num-success" aria-hidden="true">8</div>
                   <div class="step-content" data-i18n="tutorial.step8">
                     Download the <strong>ZIP file</strong> and upload it directly using Quick Import. If needed, you can also extract it and upload <code>followers_1.json</code> and <code>following.json</code> manually.
-                    <!-- Download the <strong>ZIP file</strong>, extract it, then locate <code>followers_1.json</code> and <code>following.json</code> to upload above. -->
                   </div>
                 </li>
-
               </ol>
 
               <!-- TIPS -->
@@ -451,7 +429,6 @@
                     <p class="tip-desc" data-i18n="tutorial.tip1.desc">Meta can take minutes or hours depending on account size.</p>
                   </div>
                 </div>
-
                 <div class="tip">
                   <div class="tip-icon tip-icon-danger" aria-hidden="true">
                     <i data-lucide="alert-circle"></i>
@@ -462,12 +439,10 @@
                   </div>
                 </div>
               </div>
-
             </div>
 
             <!-- SLIDESHOW -->
             <div class="tutorial-slides-wrap">
-
               <div class="slides-header">
                 <div>
                   <p class="section-label" data-i18n="tutorial.slides.label">Visual Guide</p>
@@ -480,57 +455,47 @@
               </div>
 
               <div class="slideshow" role="region" aria-label="Tutorial screenshots slideshow">
-
                 <div class="slides-container">
-
-                  <div class="slide fade-slide" data-slide="1" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 1 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                  <div class="slide" data-slide="1" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 1 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
                     <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB0EFDA621FCDAF59078A" alt="Step 1 screenshot" loading="lazy" />
                     <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
                     <span class="slide-counter" aria-hidden="true">1 / 8</span>
                   </div>
-
-                  <div class="slide fade-slide" data-slide="2" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 2 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                  <div class="slide" data-slide="2" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 2 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
                     <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB0FF755C5DF69BAA6C60" alt="Step 2 screenshot" loading="lazy" />
                     <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
                     <span class="slide-counter" aria-hidden="true">2 / 8</span>
                   </div>
-
-                  <div class="slide fade-slide" data-slide="3" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 3 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                  <div class="slide" data-slide="3" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 3 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
                     <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB09500F60B3188C93571" alt="Step 3 screenshot" loading="lazy" />
                     <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
                     <span class="slide-counter" aria-hidden="true">3 / 8</span>
                   </div>
-
-                  <div class="slide fade-slide" data-slide="4" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 4 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                  <div class="slide" data-slide="4" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 4 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
                     <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB0F65CD1B4B210E4F212" alt="Step 4 screenshot" loading="lazy" />
                     <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
                     <span class="slide-counter" aria-hidden="true">4 / 8</span>
                   </div>
-
-                  <div class="slide fade-slide" data-slide="5" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 5 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                  <div class="slide" data-slide="5" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 5 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
                     <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB0F739429C44EF648332" alt="Step 5 screenshot" loading="lazy" />
                     <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
                     <span class="slide-counter" aria-hidden="true">5 / 8</span>
                   </div>
-
-                  <div class="slide fade-slide" data-slide="6" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 6 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                  <div class="slide" data-slide="6" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 6 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
                     <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB096699A9A6B7C233557" alt="Step 6 screenshot" loading="lazy" />
                     <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
                     <span class="slide-counter" aria-hidden="true">6 / 8</span>
                   </div>
-
-                  <div class="slide fade-slide" data-slide="7" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 7 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                  <div class="slide" data-slide="7" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 7 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
                     <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB00C92C129A246DB7D50" alt="Step 7 screenshot" loading="lazy" />
                     <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
                     <span class="slide-counter" aria-hidden="true">7 / 8</span>
                   </div>
-
-                  <div class="slide fade-slide" data-slide="8" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 8 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
+                  <div class="slide" data-slide="8" onclick="openModal(this)" role="button" tabindex="0" aria-label="Screenshot 8 of 8 — click to zoom" onkeydown="if(event.key==='Enter')openModal(this)">
                     <img src="https://smcdn.s45.in/whatsapp/2026/05/02/document/6281299961929-3EB0F606FC51DE46AB4EF9" alt="Step 8 screenshot" loading="lazy" />
                     <div class="slide-overlay" aria-hidden="true"><span class="slide-zoom-icon"><i data-lucide="zoom-in"></i></span></div>
                     <span class="slide-counter" aria-hidden="true">8 / 8</span>
                   </div>
-
                 </div>
 
                 <button class="slide-nav slide-prev" onclick="plusSlides(-1)" aria-label="Previous screenshot">
@@ -541,13 +506,10 @@
                 </button>
 
                 <div class="slide-dots" id="slideDots" role="tablist" aria-label="Slide navigation"></div>
-
               </div>
-
             </div>
 
           </div>
-
         </div>
       </section>
 
@@ -570,8 +532,8 @@
   </footer>
 
   <!-- TUTORIAL FAB -->
-  <button id="tutorialFab" class="tutorial-fab" aria-label="Go to Tutorial">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <button id="tutorialFab" class="tutorial-fab" aria-label="Go to Tutorial" onclick="scrollToTutorial()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
       <path d="M6.5 2H20v15H6.5A2.5 2.5 0 0 0 4 19.5V4.5A2.5 2.5 0 0 1 6.5 2z"/>
     </svg>
